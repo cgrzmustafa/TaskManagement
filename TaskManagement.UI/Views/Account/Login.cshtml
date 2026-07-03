@@ -1,0 +1,257 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Giriş Ekranı</title>
+    <link href="~/twitter-bootstrap/css/bootstrap.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f4f6f9;
+            --panel-dark: #0e2a4d;
+            --accent: #2f6fad;
+            --text-dark: #15243a;
+            --muted: #5c6b7a;
+            --line: #cfd8e3;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter',sans-serif;
+            background: var(--bg);
+            color: var(--text-dark);
+        }
+
+        .auth-shell {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 38% 62%;
+        }
+
+        .auth-aside {
+            background: var(--panel-dark);
+            color: #eef1ea;
+            padding: 56px 48px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .auth-aside::before {
+                content: "";
+                position: absolute;
+                right: 20px;
+                top: -60px;
+                width: 160px;
+                height: 160px;
+                border: 1px solid rgba(255,255,255,.08);
+                border-radius: 50%;
+            }
+
+            .auth-aside::after {
+                content: "";
+                position: absolute;
+                right: -80px;
+                bottom: -80px;
+                width: 260px;
+                height: 260px;
+                border: 1px solid rgba(255,255,255,.12);
+                border-radius: 50%;
+            }
+
+        .auth-aside-title {
+            font-family: 'Fraunces',serif;
+            font-weight: 500;
+            font-size: 2.6rem;
+            line-height: 1.12;
+            margin: 0 0 20px;
+        }
+
+        .auth-aside-text {
+            color: #c3cdc4;
+            max-width: 280px;
+            font-size: .95rem;
+            margin: 0;
+        }
+
+        .auth-dots {
+            margin-top: auto;
+            display: flex;
+            gap: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+            .auth-dots span {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: rgba(255,255,255,.25);
+            }
+
+                .auth-dots span.on {
+                    background: var(--accent);
+                    width: 22px;
+                    border-radius: 5px;
+                }
+
+        .auth-aside-foot {
+            margin-top: 24px;
+            font-size: .78rem;
+            color: #8ea092;
+            position: relative;
+            z-index: 1;
+        }
+
+        .auth-main {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 24px;
+        }
+
+        .auth-form-wrap {
+            width: 100%;
+            max-width: 380px;
+        }
+
+        .auth-eyebrow {
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            font-size: .72rem;
+            color: var(--accent);
+            font-weight: 600;
+            margin: 0 0 10px;
+        }
+
+        .auth-title {
+            font-family: 'Fraunces',serif;
+            font-size: 1.9rem;
+            color: var(--text-dark);
+            margin: 0 0 6px;
+        }
+
+        .auth-subtitle {
+            color: var(--muted);
+            font-size: .92rem;
+            margin: 0;
+        }
+
+        .auth-row {
+            display: flex;
+            gap: 16px;
+        }
+
+            .auth-row .form-floating {
+                flex: 1;
+            }
+
+        .form-floating > .form-control {
+            border: none;
+            border-bottom: 2px solid var(--line);
+            border-radius: 0;
+            background: transparent;
+            padding-left: 2px;
+            font-size: 1rem;
+        }
+
+            .form-floating > .form-control:focus {
+                box-shadow: none;
+                border-bottom-color: var(--panel-dark);
+            }
+
+        .form-floating > label {
+            color: var(--muted);
+            padding-left: 2px;
+        }
+
+        .auth-btn-primary {
+            background: var(--panel-dark);
+            color: #fff;
+            border: none;
+            padding: 13px;
+            font-weight: 600;
+            letter-spacing: .02em;
+            box-shadow: 5px 5px 0 var(--accent);
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
+
+            .auth-btn-primary:hover {
+                transform: translate(-2px,-2px);
+                box-shadow: 7px 7px 0 var(--accent);
+                color: #fff;
+            }
+
+        .auth-btn-ghost {
+            background: transparent;
+            border: none;
+            color: var(--text-dark);
+            font-size: .88rem;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+            padding: 8px;
+        }
+
+            .auth-btn-ghost:hover {
+                color: var(--accent);
+            }
+
+        @@media (max-width:860px) {
+            .auth-shell {
+                grid-template-columns: 1fr;
+            }
+
+            .auth-aside {
+                display: none;
+            }
+
+            .auth-main {
+                padding: 60px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-shell">
+        <aside class="auth-aside">
+            <h1 class="auth-aside-title">Personel<br>Yönetim<br>Sistemi</h1>
+            <div class="auth-dots" aria-hidden="true">
+                <span class="on"></span><span></span><span></span>
+            </div>
+            <div class="auth-aside-foot">© 2026 · Personel Yönetim Sistemi</div>
+        </aside>
+        <main class="auth-main">
+            <div class="auth-form-wrap">
+                <p class="auth-eyebrow">Giriş Ekranı</p>
+                <h2 class="auth-title">Tekrar hoş geldiniz</h2>
+                <p class="auth-subtitle">Devam etmek için bilgilerinizi girin.</p>
+
+                <form class="mt-4">
+                    <div class="form-floating mb-3 mt-4">
+                        <input type="text" class="form-control" id="username" placeholder="">
+                        <label for="username">Kullanıcı Adı</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="password" class="form-control" id="password" placeholder="">
+                        <label for="password">Parola</label>
+                    </div>
+                    <div class="d-grid gap-2 mt-4">
+                        <button class="btn auth-btn-primary" type="submit">Giriş Yap</button>
+                        <a class="btn auth-btn-ghost" href="#">Hesabınız yok mu? Kayıt Ol</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
