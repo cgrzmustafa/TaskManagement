@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TaskManagement.Application.Interfaces;
 using TaskManagement.Persistance.Context;
+using TaskManagement.Persistance.Repositories;
 
 namespace TaskManagement.Persistance
 {
@@ -18,6 +20,8 @@ namespace TaskManagement.Persistance
             {
                 opt.UseSqlServer(configuration.GetConnectionString("Local"));
             });
+
+            services.AddScoped<IUserRepository, UserRepository>();
         }
     }
 }

@@ -236,13 +236,13 @@
                 <h2 class="auth-title">Tekrar hoş geldiniz</h2>
                 <p class="auth-subtitle">Devam etmek için bilgilerinizi girin.</p>
 
-                <form class="mt-4">
+                <form action="/Account/Login" class="mt-4" method="post">
                     <div class="form-floating mb-3 mt-4">
-                        <input type="text" class="form-control" id="username" placeholder="">
+                        <input type="text" class="form-control" id="username" name="Username" placeholder="">
                         <label for="username">Kullanıcı Adı</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="password" class="form-control" id="password" placeholder="">
+                        <input type="password" class="form-control" id="password" name="Password" placeholder="">
                         <label for="password">Parola</label>
                     </div>
                     <div class="d-grid gap-2 mt-4">

@@ -1,15 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace TaskManagement.UI.Controllers
+namespace TaskManagement.UI.Controllers.Admin
 {
+    [Area("Admin")]
     public class HomeController : Controller
     {
         public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Index2()
         {
             return View();
         }
