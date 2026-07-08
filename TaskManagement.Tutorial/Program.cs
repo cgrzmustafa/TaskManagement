@@ -6,10 +6,10 @@
 
         //people.GetirZeynep();
 
-        people.Add(new Person { Id = 1, Name="Yavuz Selim"});
-        people.Add(new Person { Id = 2, Name="Zeynep"});
-        people.Add(new Person { Id = 3, Name="Çağdaş"});
-        people.Add(new Person { Id = 4, Name="Kaan"});
+        people.Add(new Person { Id = 1, Name = "Yavuz Selim" });
+        people.Add(new Person { Id = 2, Name = "Zeynep" });
+        people.Add(new Person { Id = 3, Name = "Çağdaş" });
+        people.Add(new Person { Id = 4, Name = "Kaan" });
 
         var zeynepII = people.GetirZeynep();
         var zeynep = people.SingleOrDefault(x => x.Name == "Zeynep");

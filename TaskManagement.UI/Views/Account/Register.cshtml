@@ -1,4 +1,5 @@
-﻿@{
+﻿@model TaskManagement.Application.Requests.RegisterRequest
+@{
     Layout = null;
 }
 <!DOCTYPE html>
@@ -236,32 +237,35 @@
                 <h2 class="auth-title">Hesap oluşturun</h2>
                 <p class="auth-subtitle">Başlamak için bilgilerinizi girin.</p>
 
-                <form class="mt-4">
+                <form asp-action="Register" asp-controller="Account" asp-area="" class="mt-4">
                     <div class="auth-row mt-4">
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="name" placeholder="">
+                            <input type="text" class="form-control" asp-for="Name" placeholder="">
                             <label for="username">Ad</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="surname" placeholder="">
+                            <input type="text" class="form-control" asp-for="Surname" placeholder="">
                             <label for="username">Soyad</label>
                         </div>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="username" placeholder="">
+                        <input type="text" class="form-control" asp-for="Username" placeholder="">
                         <label for="username">Kullanıcı Adı</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="password" class="form-control" id="password" placeholder="">
+                        <input type="password" class="form-control" asp-for=Password placeholder="">
                         <label for="password">Parola</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input type="password" class="form-control" id="password" placeholder="">
-                        <label for="password">Parola Tekrar</label>
+                        <input type="password" class="form-control" asp-for="ConfirmPassword" placeholder="">
+                        <label for="confirmpassword">Parola Tekrar</label>
                     </div>
                     <div class="d-grid gap-2 mt-4">
                         <button class="btn auth-btn-primary" type="submit">Kayıt Ol</button>
-                        <a class="btn auth-btn-ghost" href="#">Zaten hesabınız var mı? Giriş Yap</a>
+                        <a class="btn auth-btn-ghost" asp-action="Login" asp-controller="Account" asp-area="">Zaten hesabınız var mı? Giriş Yap</a>
+                    </div>
+
+                    <div asp-validation-summary="All" class="text-danger lead">
                     </div>
                 </form>
             </div>

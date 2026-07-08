@@ -1,8 +1,19 @@
-using TaskManagement.Persistance;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using TaskManagement.Application.Extensions;
+using TaskManagement.Persistance;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(opt =>
+    {
+        opt.Cookie.Name = "LoginCokiee";
+        opt.Cookie.HttpOnly = true;
+        opt.Cookie.SameSite = SameSiteMode.Strict;
+        opt.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    });
+
 builder.Services.AddPersistanceServices(builder.Configuration);
 builder.Services.AddApplicationServices();
 
@@ -10,6 +21,9 @@ var app = builder.Build();
 
 
 app.UseStaticFiles();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 // || AREA ALAN => Member, Admin =>
 

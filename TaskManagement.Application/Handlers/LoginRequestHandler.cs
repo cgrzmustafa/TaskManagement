@@ -1,10 +1,6 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TaskManagement.Application.Dtos;
+using TaskManagement.Application.Enums;
 using TaskManagement.Application.Extensions;
 using TaskManagement.Application.Interfaces;
 using TaskManagement.Application.Requests;
@@ -27,10 +23,13 @@ namespace TaskManagement.Application.Handlers
             var validationResult = await validator.ValidateAsync(request);
             if (validationResult.IsValid)
             {
-                var user = await this.userRepository.GetByFilter(x=>x.Password == request.Password && x.Username == request.Username);
+                var user = await this.userRepository.GetByFilterAsync(x => x.Password == request.Password && x.Username == request.Username);
+
+
                 if (user != null)
                 {
-                    return new Result<LoginResponseDto?>(new LoginResponseDto(user.Name, user.Surname, user.AppRoleId), true, null, null);
+                    var type = (RoleType)user.AppRoleId;
+                    return new Result<LoginResponseDto?>(new LoginResponseDto(user.Name, user.Surname, type), true, null, null);
                 }
                 else
                 {
@@ -40,7 +39,7 @@ namespace TaskManagement.Application.Handlers
             else
             {
                 var errorList = validationResult.Errors.ToMap();
-                    return new Result<LoginResponseDto?>(null, false, null, errorList);
+                return new Result<LoginResponseDto?>(null, false, null, errorList);
             }
         }
     }

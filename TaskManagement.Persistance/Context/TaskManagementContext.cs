@@ -1,9 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TaskManagement.Domain.Entities;
 using TaskManagement.Persistance.Configurations;
 
@@ -11,7 +6,7 @@ namespace TaskManagement.Persistance.Context
 {
     public class TaskManagementContext : DbContext
     {
-        public TaskManagementContext(DbContextOptions<TaskManagementContext> options) : base(options) 
+        public TaskManagementContext(DbContextOptions<TaskManagementContext> options) : base(options)
         {
 
         }

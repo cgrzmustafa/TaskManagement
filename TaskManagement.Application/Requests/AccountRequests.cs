@@ -1,12 +1,9 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TaskManagement.Application.Dtos;
 
 namespace TaskManagement.Application.Requests
 {
-    public record LoginRequest(string Username, string Password) : IRequest<Result<LoginResponseDto?>>;
+    public record LoginRequest(string? Username, string? Password, bool RememberMe = false) : IRequest<Result<LoginResponseDto?>>;
+
+    public record RegisterRequest(string? Username, string? Password, string? ConfirmPassword, string? Name, string? Surname) : IRequest<Result<NoData>>;
 }

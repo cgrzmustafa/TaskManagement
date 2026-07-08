@@ -5,6 +5,7 @@ namespace TaskManagement.Application.Interfaces
 {
     public interface IUserRepository
     {
-        Task<AppUser?> GetByFilter(Expression<Func<AppUser, bool>> filter, bool asNoTracking = true);
+        Task<AppUser?> GetByFilterAsync(Expression<Func<AppUser, bool>> filter, bool asNoTracking = true);
+        Task<int> CreateUserAsync(AppUser user);
     }
 }
