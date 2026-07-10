@@ -24,7 +24,7 @@ namespace TaskManagement.Application.Handlers
             if (validationResult.IsValid)
             {
                 var rowCount = await this.userRepository.CreateUserAsync(request.ToMap());
-                if(rowCount > 0)
+                if (rowCount > 0)
                 {
                     return new Result<NoData>(new NoData(), true, null, null);
                 }

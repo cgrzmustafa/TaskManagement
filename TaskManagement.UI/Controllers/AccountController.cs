@@ -63,7 +63,7 @@ namespace TaskManagement.UI.Controllers
         public async Task<IActionResult> Register(RegisterRequest request)
         {
             var result = await this.mediator.Send(request);
-            if(result.IsSuccess)
+            if (result.IsSuccess)
             {
                 return RedirectToAction("Login");
             }
