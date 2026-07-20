@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagement.Application.Requests;
@@ -19,18 +18,21 @@ namespace TaskManagement.UI.Controllers.Admin
 
         public async Task<IActionResult> List()
         {
+            ViewBag.Active = "Priority";
             var result = await this.mediator.Send(new PriorityListRequest());
             return View(result.Data);
         }
 
         public IActionResult Create()
         {
+            ViewBag.Active = "Priority";
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(PriorityCreateRequest request)
         {
+            ViewBag.Active = "Priority";
             var result = await this.mediator.Send(request);
             if (result.IsSuccess)
             {
@@ -57,12 +59,14 @@ namespace TaskManagement.UI.Controllers.Admin
 
         public async Task<IActionResult> Delete(int id)
         {
+            ViewBag.Active = "Priority";
             var result = await this.mediator.Send(new PriorityDeleteRequest(id));
             return RedirectToAction("List");
         }
 
         public async Task<IActionResult> Update(int id)
         {
+            ViewBag.Active = "Priority";
             var result = await this.mediator.Send(new PriorityGetByIdRequest(id));
             if (result.IsSuccess)
             {
@@ -80,6 +84,7 @@ namespace TaskManagement.UI.Controllers.Admin
         [HttpPost]
         public async Task<IActionResult> Update(PriorityUpdateRequest request)
         {
+            ViewBag.Active = "Priority";
             var result = await this.mediator.Send(request);
             if (result.IsSuccess)
             {

@@ -1,9 +1,4 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TaskManagement.Application.Dtos;
 using TaskManagement.Application.Interfaces;
 using TaskManagement.Application.Requests;
@@ -27,7 +22,7 @@ namespace TaskManagement.Application.Handlers
                 await this.repository.DeleteAsync(deletedEntity);
                 return new Result<NoData>(new NoData(), true, null, null);
             }
-                return new Result<NoData>(new NoData(), false, "Silinecek aciliyet bulunamadı", null);
+            return new Result<NoData>(new NoData(), false, "Silinecek aciliyet bulunamadı", null);
         }
     }
 }

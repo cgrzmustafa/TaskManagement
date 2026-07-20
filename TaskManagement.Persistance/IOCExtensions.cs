@@ -18,6 +18,8 @@ namespace TaskManagement.Persistance
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IPriorityRepository, PriorityRepository>();
+            services.AddScoped<IAppTaskRepository, AppTaskRepository>();
+            services.AddScoped<ITaskReportRepository, TaskReportRepository>();
         }
     }
 }

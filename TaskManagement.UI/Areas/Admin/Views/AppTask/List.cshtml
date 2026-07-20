@@ -1,7 +1,7 @@
-﻿@model List<PriorityListDto>
+﻿@model PagedResult<AppTaskListDto>
 @{
     Layout = "_AdminLayout";
-    ViewBag.Title = "Aciliyet Tanımlama Ekranı";
+    ViewBag.Title = "İş Emri Tanımlama Ekranı";
 }
 <style>
     .page-header {
@@ -152,6 +152,122 @@
         font-size: .88rem;
     }
 
+    /* --- Arama kutusu (input-group) --- */
+    .input-group .form-control {
+        border: 1px solid var(--line);
+        font-size: .85rem;
+        padding: 9px 14px;
+        box-shadow: none;
+    }
+
+        .input-group .form-control:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+            z-index: 1;
+        }
+
+    .input-group .btn-outline-secondary {
+        border: 1px solid var(--line);
+        border-left: none;
+        background: #fff;
+        color: var(--muted);
+        font-size: .82rem;
+        font-weight: 600;
+    }
+
+        .input-group .btn-outline-secondary:hover {
+            background: var(--accent-soft);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+    /* --- Toolbar + Arama satırı hizalaması --- */
+    .row {
+        align-items: center;
+        margin-bottom: 22px;
+    }
+
+        .row .table-toolbar {
+            background: transparent;
+            border-bottom: none;
+            padding: 0;
+            justify-content: flex-start;
+        }
+
+        .row .input-group {
+            margin-bottom: 0 !important;
+        }
+
+            .row .input-group .form-control,
+            .row .input-group .btn {
+                height: 40px;
+            }
+
+    .alert-secondary {
+        background: var(--accent-soft);
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        color: var(--text-dark);
+        font-size: .85rem;
+        padding: 12px 16px;
+        overflow: hidden; 
+    }
+
+        .alert-secondary strong {
+            color: var(--accent);
+        }
+
+        .alert-secondary .float-end {
+            display: inline-flex;
+            align-items: center;
+            color: var(--muted);
+            font-weight: 600;
+            font-size: .82rem;
+            text-decoration: none;
+            padding: 4px 10px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            background: #fff;
+            transition: background .15s ease, color .15s ease, border-color .15s ease;
+        }
+
+            .alert-secondary .float-end:hover {
+                background: var(--panel-dark);
+                border-color: var(--panel-dark);
+                color: #fff;
+            }
+
+    /* --- Sayfalama (pagination) --- */
+    .table-wrap .float-end {
+        padding: 14px 16px;
+    }
+
+    .pagination {
+        gap: 4px;
+    }
+
+        .pagination .page-item .page-link {
+            border: 1px solid var(--line);
+            border-radius: 6px !important;
+            color: var(--text-dark);
+            font-size: .82rem;
+            font-weight: 600;
+            padding: 6px 12px;
+            box-shadow: none;
+        }
+
+            .pagination .page-item .page-link:hover {
+                background: var(--accent-soft);
+                border-color: var(--accent);
+                color: var(--accent);
+            }
+
+            .pagination .page-item .page-link.active {
+                background: var(--panel-dark);
+                border-color: var(--panel-dark);
+                color: #fff;
+            }
+
     /* --- Silme onay modalı --- */
     #deleteConfirmModal .modal-content {
         border: none;
@@ -226,32 +342,63 @@
 <div class="page-header">
     <div>
         <p class="page-header-eyebrow">Tanımlamalar</p>
-        <h1 class="page-header-title">Aciliyet Tanımlama Ekranı</h1>
-        <p class="page-header-sub">Sistemde kullanılacak aciliyet durumlarını görüntüleyin ve yönetin.</p>
+        <h1 class="page-header-title">İş Emirleri Tanımlama Ekranı</h1>
+        <p class="page-header-sub">Sistemde kullanılacak iş emirlerini görüntüleyin ve yönetin.</p>
     </div>
 </div>
 
-<div class="table-wrap">
-    <div class="table-toolbar">
-        <a asp-action="Create" asp-controller="Priority" asp-area="Admin" class="btn-add">Yeni Aciliyet Durumu Ekle</a>
+<div class="row">
+    <div class="col-9">
+        <div class="table-toolbar">
+            <a asp-action="Create" asp-controller="AppTask" asp-area="Admin" class="btn-add">Yeni İş Emri Ekle</a>
+        </div>
     </div>
+    <div class="col-3">
+        <form asp-action="List" asp-controller="AppTask" asp-area="Admin" method="get">
+            <div class="input-group mb-3">
+                <input type="text" name="s" class="form-control" placeholder="İş Emri Ara" aria-label="İş Emri Ara" aria-describedby="button-addon2" />
+                <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Ara</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@{
+    if (!string.IsNullOrEmpty(ViewBag.s))
+    {
+        <div class="row">
+            <div class="alert alert-secondary" role="alert">
+                Şu anda <strong>@ViewBag.s</strong> arama filtresine göre kayıtları görmektesiniz.
+                <a asp-action="List" asp-controller="AppTask" asp-route-s="" asp-area="Admin" class="float-end">Filtreyi Kaldır</a>
+            </div>
+        </div>
+    }
+}
+
+<div class="table-wrap">
     <table class="table table-sm mb-0">
         <thead>
             <tr>
-                <th scope="col">Tanım</th>
-                <th scope="col">İşlem</th>
+                <th scope="col">İş Emri</th>
+                <th scope="col">İşin Aciliyeti</th>
+                <th scope="col">İşin Durumu</th>
+                <th scope="col">Personel</th>
+                <th scope="col"></th>
             </tr>
         </thead>
         <tbody>
-            @if (Model?.Count > 0)
+            @if (Model.Data?.Count > 0)
             {
-                @foreach (var item in Model)
+                @foreach (var item in Model.Data)
                 {
                     <tr>
-                        <td>@item.Definition</td>
+                        <td>@item.Title</td>
+                        <td>@item.PriorityDefinition</td>
+                        <td>@(item.State ? "Tamamlandı" : "Tamamlanmadı")</td>
+                        <td>@(item.AppUserId.HasValue ? item.AppUserFullname : "Atanmamış")</td>
                         <td>
-                            <a asp-action="Update" asp-controller="Priority" asp-area="Admin" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Düzenle</a>
-                            <a asp-action="Delete" asp-controller="Priority" asp-area="Admin" asp-route-id="@item.Id"
+                            <a asp-action="Update" asp-controller="AppTask" asp-area="Admin" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Detay</a>
+                            <a asp-action="Delete" asp-controller="AppTask" asp-area="Admin" asp-route-id="@item.Id"
                                class="btn btn-sm btn-danger js-delete-trigger"
                                data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">Sil</a>
                         </td>
@@ -261,11 +408,28 @@
             else
             {
                 <tr>
-                    <td colspan="2" class="empty-state">Herhangi aciliyet tanımı bulunamadı.</td>
+                    <td colspan="4" class="empty-state">Herhangi bir iş emri bulunamadı.</td>
                 </tr>
             }
         </tbody>
     </table>
+
+    <div class="float-end">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+
+                @for (int i = 1; i <= Model.TotalPage; i++)
+                {
+                    <li class="page-item">
+                        <a class="page-link @(Model.ActivePage == i ? "active":"")" asp-route-activePage="@i" asp-route-s="@ViewBag.s" asp-action="List" asp-controller="AppTask" asp-area="Admin">@i</a>
+                    </li>
+                }
+
+            </ul>
+        </nav>
+    </div>
+
+
 </div>
 
 <!-- Silme onay modalı -->
@@ -280,7 +444,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
             </div>
             <div class="modal-body">
-                Bu işlem geri alınamaz. Aciliyet tanımı kalıcı olarak silinecektir.
+                Bu işlem geri alınamaz. İş emri kalıcı olarak silinecektir.
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-cancel" data-bs-dismiss="modal">Vazgeç</button>

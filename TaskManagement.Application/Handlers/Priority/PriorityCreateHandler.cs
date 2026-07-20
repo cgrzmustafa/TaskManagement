@@ -26,9 +26,9 @@ namespace TaskManagement.Application.Handlers
                 var rowCount = await this.repository.CreateAsync(request.ToMap());
                 if (rowCount > 0)
                 {
-                    return new Result<NoData>(new NoData(), true,null,null);
+                    return new Result<NoData>(new NoData(), true, null, null);
                 }
-                return new Result<NoData>(new NoData(), false, "Sistemsel bir hata oluştu, sistem üreticinize başvurun",  null);
+                return new Result<NoData>(new NoData(), false, "Sistemsel bir hata oluştu, sistem üreticinize başvurun", null);
             }
             else
             {

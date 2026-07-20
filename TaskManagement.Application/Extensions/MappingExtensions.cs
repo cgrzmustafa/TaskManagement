@@ -1,4 +1,5 @@
-﻿using TaskManagement.Application.Enums;
+﻿using TaskManagement.Application.Dtos;
+using TaskManagement.Application.Enums;
 using TaskManagement.Application.Requests;
 using TaskManagement.Domain.Entities;
 
@@ -25,5 +26,32 @@ namespace TaskManagement.Application.Extensions
                 Definiton = request.Definition,
             };
         }
+
+        public static AppTask ToMap(this AppTaskCreateRequest request)
+        {
+            return new AppTask
+            {
+                Description = request.Description,
+                Title = request.Title,
+                PriorityId = request.PriorityId,
+                State = false
+            };
+        }
+
+        public static AppTaskListDto ToMap(this AppTask appTask)
+        {
+            return new AppTaskListDto(appTask.Id, appTask.Title, appTask.Description, appTask?.Priority?.Definiton, appTask.State, appTask.AppUserId, appTask.AppUserId.HasValue ? appTask.AppUser?.Name + " " + appTask.AppUser?.Surname : null, appTask.PriorityId);
+        }
+
+        public static List<MemberListDto> ToMap(this List<AppUser> users)
+        {
+            return users.Select(x => new MemberListDto(x.Id, x.Name, x.Surname, x.Username)).ToList();
+        }
+
+        public static List<TaskReportListDto> ToMap(this List<TaskReport> list)
+        {
+            return list.Select(x => new TaskReportListDto(x.Id, x.Definition, x.Detail, x.AppTaskId)).ToList();
+        }
+
     }
 }
