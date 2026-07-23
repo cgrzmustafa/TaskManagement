@@ -10,5 +10,7 @@ namespace TaskManagement.Application.Interfaces
         Task<int> CreateUserAsync(AppUser user);
         Task<List<AppUser>?> GetAllByFilterAsync(Expression<Func<AppUser, bool>> filter, bool asNoTracking = true);
         Task<PagedData<AppUser>> GetAllAsync(int activePage, string? s = null, int pageSize = 10);
+        Task<int> SaveChangesAsync();
+        Task DeleteAsync(AppUser deleted);
     }
 }

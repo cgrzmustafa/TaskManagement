@@ -1,0 +1,161 @@
+﻿@model MemberUpdateRequest
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Title = "Kullanıcı Güncelleme Ekranı";
+}
+
+<style>
+    .page-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 22px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .page-header-eyebrow {
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        font-size: .72rem;
+        font-weight: 700;
+        color: var(--accent);
+        margin: 0 0 6px;
+    }
+
+    .page-header-title {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .page-header-sub {
+        font-size: .85rem;
+        color: var(--muted);
+        margin: 4px 0 0;
+    }
+
+    .form-card {
+        max-width: 520px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 28px;
+        background: #fff;
+    }
+
+        .form-card .form-label {
+            font-size: .82rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+
+        .form-card .form-control {
+            border: 1px solid var(--line);
+            border-radius: 7px;
+            padding: 10px 14px;
+            font-size: .9rem;
+            color: var(--text-dark);
+            transition: border-color .15s ease, box-shadow .15s ease;
+        }
+
+            .form-card .form-control:focus {
+                border-color: var(--accent);
+                box-shadow: 0 0 0 3px var(--accent-soft);
+            }
+
+            .form-card .form-control.input-validation-error {
+                border-color: #c0392b;
+            }
+
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 24px;
+    }
+
+    .btn-save {
+        background: var(--panel-dark);
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        font-size: .85rem;
+        padding: 10px 22px;
+        border-radius: 7px;
+        transition: background .15s ease, transform .15s ease;
+    }
+
+        .btn-save:hover {
+            background: var(--accent);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+    .btn-cancel-link {
+        display: inline-flex;
+        align-items: center;
+        color: var(--muted);
+        font-weight: 600;
+        font-size: .85rem;
+        text-decoration: none;
+        padding: 10px 8px;
+    }
+
+        .btn-cancel-link:hover {
+            color: var(--text-dark);
+        }
+
+    .validation-summary-errors ul {
+        list-style: none;
+        margin: 16px 0 0;
+        padding: 12px 16px;
+        background: #fdecec;
+        border: 1px solid #f3c9c4;
+        border-radius: 7px;
+        color: #c0392b;
+        font-size: .85rem;
+    }
+
+        .validation-summary-errors ul li {
+            margin: 0;
+        }
+
+    span.field-validation-error {
+        display: block;
+        margin-top: 6px;
+        font-size: .78rem;
+        color: #c0392b;
+        font-weight: 500;
+    }
+</style>
+
+<div class="page-header">
+    <div>
+        <p class="page-header-eyebrow">Tanımlamalar</p>
+        <h1 class="page-header-title">Kullanıcı Güncelleme Ekranı</h1>
+        <p class="page-header-sub">Kullanıcı güncelleyin.</p>
+    </div>
+</div>
+
+<div class="form-card">
+    <form asp-action="Update" asp-controller="User" asp-area="Admin" method="post">
+        <input type="hidden" asp-for="Id" />
+        <div class="mb-3">
+            <label class="form-label">Ad: </label>
+            <input asp-for="Name" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Soyad: </label>
+            <input asp-for="Surname" class="form-control" />
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-save">Kaydet</button>
+            <a asp-action="List" asp-controller="User" asp-area="Admin" class="btn-cancel-link">Vazgeç</a>
+        </div>
+        <div asp-validation-summary="All">
+        </div>
+    </form>
+</div>

@@ -45,7 +45,7 @@ namespace TaskManagement.Persistance.Repositories
 
         public async Task<PagedData<AppUser>> GetAllAsync(int activePage, string? s = null, int pageSize = 10)
         {
-            var query = this.context.Users.Where(x=>x.AppRoleId == (int)RoleType.Member).AsQueryable();
+            var query = this.context.Users.Where(x => x.AppRoleId == (int)RoleType.Member).AsQueryable();
             if (!string.IsNullOrEmpty(s))
             {
                 query = query.Where(x => x.Name.ToLower().Contains(s.ToLower()) || x.Surname.ToLower().Contains(s.ToLower()));
@@ -53,6 +53,17 @@ namespace TaskManagement.Persistance.Repositories
 
             var list = await query.AsNoTracking().ToPagedAsync(activePage, pageSize);
             return list;
+        }
+
+        public async Task<int> SaveChangesAsync()
+        {
+            return await this.context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(AppUser deleted)
+        {
+            this.context.Users.Remove(deleted);
+            await this.context.SaveChangesAsync();
         }
 
     }

@@ -1,0 +1,112 @@
+﻿@model List<NotificationListDto>
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Title = "Bildirim Ekranı";
+}
+
+<style>
+    .page-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 22px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .page-header-eyebrow {
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        font-size: .72rem;
+        font-weight: 700;
+        color: var(--accent);
+        margin: 0 0 6px;
+    }
+
+    .page-header-title {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .page-header-sub {
+        font-size: .85rem;
+        color: var(--muted);
+        margin: 4px 0 0;
+    }
+
+    .alert {
+        border-radius: 9px;
+        padding: 14px 18px;
+        font-size: .88rem;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    /* Okunmamış bildirim */
+    .alert-primary {
+        background: var(--accent-soft);
+        border: 1px solid var(--accent);
+        color: var(--text-dark);
+    }
+
+        .alert-primary::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            flex-shrink: 0;
+            margin-right: 4px;
+        }
+
+    /* Okunmuş bildirim */
+    .alert-light {
+        background: #fff;
+        border: 1px solid var(--line);
+        color: var(--muted);
+    }
+
+    .alert a {
+        margin-left: auto;
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        background: var(--panel-dark);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: .78rem;
+        padding: 6px 14px;
+        border-radius: 6px;
+        transition: background .15s ease;
+    }
+
+        .alert a:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+</style>
+
+<div class="page-header">
+    <div>
+        <p class="page-header-eyebrow">Bildirimler</p>
+        <h1 class="page-header-title">Bildirim Ekranı</h1>
+        <p class="page-header-sub">Sistemdeki bildirimleri görüntüleyin.</p>
+    </div>
+</div>
+
+@foreach (var item in Model)
+{
+    <div class="alert @(item.State == true ? "alert-light": "alert-primary")" role="alert">
+        @item.Description @{
+            if (item.State == false)
+            {
+                <a asp-action="Update" asp-route-id="@item.Id" asp-controller="Notification">Okundu olarak işaretle</a>
+            }
+        }
+    </div>
+}

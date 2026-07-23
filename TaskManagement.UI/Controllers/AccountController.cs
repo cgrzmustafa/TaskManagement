@@ -32,7 +32,10 @@ namespace TaskManagement.UI.Controllers
             {
                 await SetAuthCookie(result.Data, request.RememberMe);
 
-                return RedirectToAction("Index", "Home", new { area = "Admin" });
+                if (result.Data.Role == Application.Enums.RoleType.Admin)
+                    return RedirectToAction("Index", "Home", new { area = "Admin" });
+                else
+                    return RedirectToAction("UserDetail", "User", new { area = "Member" });
             }
             else
             {
@@ -87,8 +90,7 @@ namespace TaskManagement.UI.Controllers
 
         public async Task<IActionResult> LogOut()
         {
-            await HttpContext.SignOutAsync(
-        CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login");
         }
 
@@ -99,6 +101,7 @@ namespace TaskManagement.UI.Controllers
 
             var claims = new List<Claim>
         {
+            new Claim("UserId", dto.Id+""),
             new Claim("Name", dto.Name),
             new Claim("Surname", dto.Surname),
             new Claim(ClaimTypes.Role, dto.Role.ToString()),

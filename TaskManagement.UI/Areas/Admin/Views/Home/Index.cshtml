@@ -1,8 +1,313 @@
-﻿@{
+﻿@model DashboardDto
+@{
     Layout = "_AdminLayout";
     ViewBag.Title = "Index";
 }
+<style>
+    .page-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 22px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--line);
+    }
 
-<p>
-    Admin Index works
-</p>
+    .page-header-eyebrow {
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        font-size: .72rem;
+        font-weight: 700;
+        color: var(--accent);
+        margin: 0 0 6px;
+    }
+
+    .page-header-title {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .page-header-sub {
+        font-size: .85rem;
+        color: var(--muted);
+        margin: 4px 0 0;
+    }
+
+    .row .card {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        border-top: 3px solid var(--accent);
+        box-shadow: none;
+        height: 100%;
+        transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+        .row .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(15,36,58,.08);
+        }
+
+    .row .card-body {
+        padding: 24px;
+    }
+
+        .row .card-body .card-title:first-child {
+            font-size: .78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .row .card-body h1.card-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 18px;
+        }
+
+        .row .card-body .btn-primary {
+            background: var(--panel-dark);
+            border: none;
+            font-size: .82rem;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 7px;
+            transition: background .15s ease, transform .15s ease;
+        }
+
+            .row .card-body .btn-primary:hover {
+                background: var(--accent);
+                transform: translateY(-1px);
+            }
+    /* Kartlara sırayla farklı vurgu rengi */
+    .col-sm-4:nth-child(1) .card {
+        border-top-color: var(--accent);
+    }
+
+    .col-sm-4:nth-child(2) .card {
+        border-top-color: #2f9e6f;
+    }
+
+    .col-sm-4:nth-child(3) .card {
+        border-top-color: #d97a3f;
+    }
+
+    /* --- Grafik kartları --- */
+    .chart-section {
+        margin-top: 28px;
+    }
+
+    .chart-card {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: #fff;
+        padding: 22px;
+        height: 100%;
+    }
+
+    .chart-card-title {
+        font-size: .95rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0 0 16px;
+    }
+
+    .chart-canvas-wrap {
+        position: relative;
+        height: 260px;
+    }
+
+    .chart-empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 260px;
+        color: var(--muted);
+        font-size: .85rem;
+    }
+</style>
+<div class="page-header">
+    <div>
+        <p class="page-header-eyebrow">Genel Bakış</p>
+        <h1 class="page-header-title">Gösterge Paneli</h1>
+        <p class="page-header-sub">Sistemdeki güncel durumu buradan takip edin.</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-4 mb-3 mb-sm-0">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">İş Emri Sayısı</h5>
+                <h1 class="card-title">@Model.TaskCount</h1>
+                <a asp-action="List" asp-controller="AppTask" asp-area="Admin" class="btn btn-primary">İş Emirlerine Git</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Kullanıcı Sayısı</h5>
+                <h1 class="card-title">@Model.UserCount</h1>
+                <a asp-action="List" asp-controller="User" asp-area="Admin" class="btn btn-primary">Kullanıcılara Git</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Okunmamış Bildirim Sayısı</h5>
+                <h1 class="card-title">@Model.NotificationCount</h1>
+                <a asp-action="List" asp-controller="Notification" asp-area="Admin" class="btn btn-primary">Bildirimlere Git</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row chart-section">
+    <div class="col-lg-4 mb-3">
+        <div class="chart-card">
+            <p class="chart-card-title">Durum Dağılımı</p>
+            @if (Model.TasksByStatus != null && Model.TasksByStatus.Count > 0)
+            {
+                <div class="chart-canvas-wrap">
+                    <canvas id="chartStatus"></canvas>
+                </div>
+            }
+            else
+            {
+                <div class="chart-empty">Gösterilecek veri yok.</div>
+            }
+        </div>
+    </div>
+    <div class="col-lg-4 mb-3">
+        <div class="chart-card">
+            <p class="chart-card-title">Aciliyete Göre Dağılım</p>
+            @if (Model.TasksByPriority != null && Model.TasksByPriority.Count > 0)
+            {
+                <div class="chart-canvas-wrap">
+                    <canvas id="chartPriority"></canvas>
+                </div>
+            }
+            else
+            {
+                <div class="chart-empty">Gösterilecek veri yok.</div>
+            }
+        </div>
+    </div>
+    <div class="col-lg-4 mb-3">
+        <div class="chart-card">
+            <p class="chart-card-title">Personel Bazında İş Yükü</p>
+            @if (Model.TasksByUser != null && Model.TasksByUser.Count > 0)
+            {
+                <div class="chart-canvas-wrap">
+                    <canvas id="chartUser"></canvas>
+                </div>
+            }
+            else
+            {
+                <div class="chart-empty">Gösterilecek veri yok.</div>
+            }
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    (function () {
+        var accent = '#2f6fad';
+        var panelDark = '#0e2a4d';
+        var green = '#2f9e6f';
+        var orange = '#d97a3f';
+        var red = '#c0392b';
+        var gridColor = '#e4e7ec';
+        var textMuted = '#6b7789';
+
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = textMuted;
+
+        var statusData = @Html.Raw(Json.Serialize(Model.TasksByStatus ?? new List<ChartItemDto>()));
+        var priorityData = @Html.Raw(Json.Serialize(Model.TasksByPriority ?? new List<ChartItemDto>()));
+        var userData = @Html.Raw(Json.Serialize(Model.TasksByUser ?? new List<ChartItemDto>()));
+
+        // --- 1) Durum dağılımı: Doughnut ---
+        if (statusData.length > 0) {
+            new Chart(document.getElementById('chartStatus'), {
+                type: 'doughnut',
+                data: {
+                    labels: statusData.map(x => x.label),
+                    datasets: [{
+                        data: statusData.map(x => x.value),
+                        backgroundColor: [accent, gridColor],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '68%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { boxWidth: 10, padding: 16, font: { size: 12 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- 2) Aciliyete göre dağılım: Bar ---
+        if (priorityData.length > 0) {
+            new Chart(document.getElementById('chartPriority'), {
+                type: 'bar',
+                data: {
+                    labels: priorityData.map(x => x.label),
+                    datasets: [{
+                        data: priorityData.map(x => x.value),
+                        backgroundColor: orange,
+                        borderRadius: 5,
+                        maxBarThickness: 36
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: gridColor } }
+                    }
+                }
+            });
+        }
+
+        // --- 3) Personel bazında iş yükü: Yatay Bar ---
+        if (userData.length > 0) {
+            new Chart(document.getElementById('chartUser'), {
+                type: 'bar',
+                data: {
+                    labels: userData.map(x => x.label),
+                    datasets: [{
+                        data: userData.map(x => x.value),
+                        backgroundColor: green,
+                        borderRadius: 5,
+                        maxBarThickness: 22
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: gridColor } },
+                        y: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+    })();
+</script>

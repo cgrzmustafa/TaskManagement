@@ -43,6 +43,15 @@ namespace TaskManagement.Persistance.Repositories
             await this.context.SaveChangesAsync();
         }
 
+        public async Task<List<AppTask>?> GetAllByFilter(Expression<Func<AppTask, bool>> filter)
+        {
+            return await this.context.Tasks
+                .Include(x => x.AppUser)
+                .Include(x => x.Priority)
+                .Where(filter)
+                .ToListAsync();
+        }
+
         public async Task<AppTask?> GetByFilterAsync(Expression<Func<AppTask, bool>> filter)
         {
             return await this.context.Tasks.SingleOrDefaultAsync(filter);
