@@ -1,0 +1,462 @@
+﻿@model PagedResult<AppTaskListDto>
+@{
+    Layout = "_MemberLayout";
+    ViewBag.Title = "İş Emri Tanımlama Ekranı";
+}
+<style>
+    .page-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 22px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .page-header-eyebrow {
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        font-size: .72rem;
+        font-weight: 700;
+        color: var(--accent);
+        margin: 0 0 6px;
+    }
+
+    .page-header-title {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .page-header-sub {
+        font-size: .85rem;
+        color: var(--muted);
+        margin: 4px 0 0;
+    }
+
+    .table-wrap {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+        .table-wrap .table {
+            margin-bottom: 0;
+        }
+
+            .table-wrap .table thead th {
+                background: #f7f8fa;
+                color: var(--muted);
+                text-transform: uppercase;
+                letter-spacing: .04em;
+                font-size: .72rem;
+                font-weight: 700;
+                border-bottom: 1px solid var(--line);
+                padding: 12px 16px;
+            }
+
+            .table-wrap .table tbody td,
+            .table-wrap .table tbody th {
+                padding: 12px 16px;
+                font-size: .88rem;
+                color: var(--text-dark);
+                border-top: 1px solid var(--line);
+                vertical-align: middle;
+            }
+
+            .table-wrap .table tbody tr:hover {
+                background: var(--accent-soft);
+            }
+
+            .table-wrap .table tbody th[scope="row"] {
+                color: var(--muted);
+                font-weight: 600;
+            }
+
+    /* --- Toolbar / Ekle butonu --- */
+    .table-toolbar {
+        display: flex;
+        justify-content: flex-end;
+        padding: 14px 16px;
+        background: #f7f8fa;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .btn-add {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--panel-dark);
+        color: #fff;
+        font-size: .82rem;
+        font-weight: 600;
+        text-decoration: none;
+        padding: 8px 16px;
+        border-radius: 7px;
+        transition: background .15s ease, transform .15s ease;
+    }
+
+        .btn-add::before {
+            content: "+";
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .btn-add:hover {
+            background: var(--accent);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+    /* --- İşlem butonları --- */
+    .table-wrap .btn-warning,
+    .table-wrap .btn-danger {
+        border: none !important;
+        font-size: .78rem;
+        font-weight: 600;
+        padding: 6px 13px;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: background .15s ease, transform .15s ease, box-shadow .15s ease;
+    }
+
+    .table-wrap .btn-warning {
+        background: var(--accent-soft) !important;
+        color: var(--accent) !important;
+    }
+
+        .table-wrap .btn-warning:hover {
+            background: var(--accent) !important;
+            color: #fff !important;
+        }
+
+    .table-wrap .btn-danger {
+        background: #fdecec !important;
+        color: #c0392b !important;
+    }
+
+        .table-wrap .btn-danger:hover {
+            background: #c0392b !important;
+            color: #fff !important;
+        }
+
+    .table-wrap .btn-sm + .btn-sm {
+        margin-left: 6px;
+    }
+
+    .empty-state {
+        text-align: center;
+        color: var(--muted);
+        padding: 28px 16px !important;
+        font-size: .88rem;
+    }
+
+    /* --- Arama kutusu (input-group) --- */
+    .input-group .form-control {
+        border: 1px solid var(--line);
+        font-size: .85rem;
+        padding: 9px 14px;
+        box-shadow: none;
+    }
+
+        .input-group .form-control:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+            z-index: 1;
+        }
+
+    .input-group .btn-outline-secondary {
+        border: 1px solid var(--line);
+        border-left: none;
+        background: #fff;
+        color: var(--muted);
+        font-size: .82rem;
+        font-weight: 600;
+    }
+
+        .input-group .btn-outline-secondary:hover {
+            background: var(--accent-soft);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+    /* --- Toolbar + Arama satırı hizalaması --- */
+    .row {
+        align-items: center;
+        margin-bottom: 22px;
+    }
+
+        .row .table-toolbar {
+            background: transparent;
+            border-bottom: none;
+            padding: 0;
+            justify-content: flex-start;
+        }
+
+        .row .input-group {
+            margin-bottom: 0 !important;
+        }
+
+            .row .input-group .form-control,
+            .row .input-group .btn {
+                height: 40px;
+            }
+
+    .alert-secondary {
+        background: var(--accent-soft);
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        color: var(--text-dark);
+        font-size: .85rem;
+        padding: 12px 16px;
+        overflow: hidden;
+    }
+
+        .alert-secondary strong {
+            color: var(--accent);
+        }
+
+        .alert-secondary .float-end {
+            display: inline-flex;
+            align-items: center;
+            color: var(--muted);
+            font-weight: 600;
+            font-size: .82rem;
+            text-decoration: none;
+            padding: 4px 10px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            background: #fff;
+            transition: background .15s ease, color .15s ease, border-color .15s ease;
+        }
+
+            .alert-secondary .float-end:hover {
+                background: var(--panel-dark);
+                border-color: var(--panel-dark);
+                color: #fff;
+            }
+
+    /* --- Sayfalama (pagination) --- */
+    .table-wrap .float-end {
+        padding: 14px 16px;
+    }
+
+    .pagination {
+        gap: 4px;
+    }
+
+        .pagination .page-item .page-link {
+            border: 1px solid var(--line);
+            border-radius: 6px !important;
+            color: var(--text-dark);
+            font-size: .82rem;
+            font-weight: 600;
+            padding: 6px 12px;
+            box-shadow: none;
+        }
+
+            .pagination .page-item .page-link:hover {
+                background: var(--accent-soft);
+                border-color: var(--accent);
+                color: var(--accent);
+            }
+
+            .pagination .page-item .page-link.active {
+                background: var(--panel-dark);
+                border-color: var(--panel-dark);
+                color: #fff;
+            }
+
+    /* --- Silme onay modalı --- */
+    #deleteConfirmModal .modal-content {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 12px 32px rgba(15,36,58,.18);
+    }
+
+    #deleteConfirmModal .modal-header {
+        border-bottom: 1px solid var(--line);
+        padding: 18px 22px;
+    }
+
+    #deleteConfirmModal .modal-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #fdecec;
+        color: #c0392b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 14px;
+    }
+
+    #deleteConfirmModal .modal-title {
+        font-size: 1.02rem;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+    #deleteConfirmModal .modal-body {
+        padding: 22px;
+        color: var(--muted);
+        font-size: .9rem;
+    }
+
+    #deleteConfirmModal .modal-footer {
+        border-top: 1px solid var(--line);
+        padding: 16px 22px;
+    }
+
+    #deleteConfirmModal .btn-cancel {
+        background: #fff;
+        border: 1px solid var(--line);
+        color: var(--text-dark);
+        font-weight: 600;
+        font-size: .85rem;
+        padding: 8px 18px;
+        border-radius: 7px;
+    }
+
+        #deleteConfirmModal .btn-cancel:hover {
+            background: #f7f8fa;
+        }
+
+    #deleteConfirmModal .btn-confirm-delete {
+        background: #c0392b;
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        font-size: .85rem;
+        padding: 8px 18px;
+        border-radius: 7px;
+    }
+
+        #deleteConfirmModal .btn-confirm-delete:hover {
+            background: #a5311f;
+        }
+</style>
+<div class="page-header">
+    <div>
+        <p class="page-header-eyebrow">Tanımlamalar</p>
+        <h1 class="page-header-title">İş Emirleri Görüntüleme Ekranı</h1>
+        <p class="page-header-sub">İş emirlerini görüntüleyin.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-3">
+        <form asp-action="List" asp-controller="AppTask" asp-area="Member" method="get">
+            <div class="input-group mb-3">
+                <input type="text" name="s" class="form-control" placeholder="İş Emri Ara" aria-label="İş Emri Ara" aria-describedby="button-addon2" />
+                <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Ara</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@{
+    if (!string.IsNullOrEmpty(ViewBag.s))
+    {
+        <div class="row">
+            <div class="alert alert-secondary" role="alert">
+                Şu anda <strong>@ViewBag.s</strong> arama filtresine göre kayıtları görmektesiniz.
+                <a asp-action="List" asp-controller="AppTask" asp-route-s="" asp-area="Member" class="float-end">Filtreyi Kaldır</a>
+            </div>
+        </div>
+    }
+}
+
+<div class="table-wrap">
+    <table class="table table-sm mb-0">
+        <thead>
+            <tr>
+                <th scope="col">İş Emri</th>
+                <th scope="col">İşin Aciliyeti</th>
+                <th scope="col">İşin Durumu</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Data?.Count > 0)
+            {
+                @foreach (var item in Model.Data)
+                {
+                    <tr>
+                        <td>@item.Title</td>
+                        <td>@item.PriorityDefinition</td>
+                        <td>@(item.State ? "Tamamlandı" : "Tamamlanmadı")</td>
+                        <td>
+                            @{
+                                if(item.State == false) 
+                                {
+                                    <a asp-action="CompleteTask" asp-controller="AppTask" asp-area="Member" asp-route-id="@item.Id" class="btn btn-sm btn-danger js-delete-trigger"
+                                       data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">Tamamla</a>
+                                }
+                            }
+                            
+                            <a asp-action="ReportList" asp-controller="AppTask" asp-area="Member" asp-route-id="@item.Id"
+                               class="btn btn-sm btn-warning">Raporları Görüntüle</a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" class="empty-state">Herhangi bir iş emri bulunamadı.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="float-end">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+
+                @for (int i = 1; i <= Model.TotalPage; i++)
+                {
+                    <li class="page-item">
+                        <a class="page-link @(Model.ActivePage == i ? "active":"")" asp-route-activePage="@i" asp-route-s="@ViewBag.s" asp-action="List" asp-controller="AppTask" asp-area="Member">@i</a>
+                    </li>
+                }
+
+            </ul>
+        </nav>
+    </div>
+
+
+</div>
+
+<!-- Silme onay modalı -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-icon">!</div>
+                    <h5 class="modal-title">Tamamlamak istediğinize emin misiniz?</h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body">
+                Bu işlem geri alınamaz. İş emri tanımlanacaktır.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" data-bs-dismiss="modal">Vazgeç</button>
+                <a href="#" id="confirmDeleteLink" class="btn-confirm-delete">Evet, Tamamla</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('deleteConfirmModal').addEventListener('show.bs.modal', function (event) {
+        var trigger = event.relatedTarget;
+        var deleteUrl = trigger.getAttribute('href');
+        document.getElementById('confirmDeleteLink').setAttribute('href', deleteUrl);
+    });
+</script>

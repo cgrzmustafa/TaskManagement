@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TaskManagement.Domain.Entities;
 
+
 namespace TaskManagement.Persistance.Configurations
 {
     public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>

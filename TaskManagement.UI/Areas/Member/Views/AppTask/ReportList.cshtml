@@ -1,0 +1,287 @@
+﻿@model List<TaskReportListDto>
+@{
+    Layout = "_MemberLayout";
+    ViewBag.Title = "Rapor Tanımlama Ekranı";
+}
+<style>
+    .page-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 22px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .page-header-eyebrow {
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        font-size: .72rem;
+        font-weight: 700;
+        color: var(--accent);
+        margin: 0 0 6px;
+    }
+
+    .page-header-title {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .table-wrap {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+        .table-wrap .table {
+            margin-bottom: 0;
+        }
+
+            .table-wrap .table thead th {
+                background: #f7f8fa;
+                color: var(--muted);
+                text-transform: uppercase;
+                letter-spacing: .04em;
+                font-size: .72rem;
+                font-weight: 700;
+                border-bottom: 1px solid var(--line);
+                padding: 12px 16px;
+            }
+
+            .table-wrap .table tbody td {
+                padding: 12px 16px;
+                font-size: .88rem;
+                color: var(--text-dark);
+                border-top: 1px solid var(--line);
+                vertical-align: middle;
+            }
+
+            .table-wrap .table tbody tr:hover {
+                background: var(--accent-soft);
+            }
+
+    .table-toolbar {
+        display: flex;
+        justify-content: flex-end;
+        padding: 14px 16px;
+        background: #f7f8fa;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .btn-add {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--panel-dark);
+        color: #fff;
+        font-size: .82rem;
+        font-weight: 600;
+        text-decoration: none;
+        padding: 8px 16px;
+        border-radius: 7px;
+        transition: background .15s ease, transform .15s ease;
+    }
+
+        .btn-add::before {
+            content: "+";
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .btn-add:hover {
+            background: var(--accent);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+    .table-wrap .btn-warning,
+    .table-wrap .btn-danger {
+        border: none !important;
+        font-size: .78rem;
+        font-weight: 600;
+        padding: 6px 13px;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: background .15s ease, transform .15s ease;
+    }
+
+    .table-wrap .btn-warning {
+        background: var(--accent-soft) !important;
+        color: var(--accent) !important;
+    }
+
+        .table-wrap .btn-warning:hover {
+            background: var(--accent) !important;
+            color: #fff !important;
+        }
+
+    .table-wrap .btn-danger {
+        background: #fdecec !important;
+        color: #c0392b !important;
+    }
+
+        .table-wrap .btn-danger:hover {
+            background: #c0392b !important;
+            color: #fff !important;
+        }
+
+    .table-wrap .btn-sm + .btn-sm {
+        margin-left: 6px;
+    }
+
+    .empty-state {
+        text-align: center;
+        color: var(--muted);
+        padding: 28px 16px !important;
+        font-size: .88rem;
+    }
+
+    /* --- Silme onay modalı --- */
+    #deleteConfirmModal .modal-content {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 12px 32px rgba(15,36,58,.18);
+    }
+
+    #deleteConfirmModal .modal-header {
+        border-bottom: 1px solid var(--line);
+        padding: 18px 22px;
+    }
+
+    #deleteConfirmModal .modal-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #fdecec;
+        color: #c0392b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 14px;
+    }
+
+    #deleteConfirmModal .modal-title {
+        font-size: 1.02rem;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+    #deleteConfirmModal .modal-body {
+        padding: 22px;
+        color: var(--muted);
+        font-size: .9rem;
+    }
+
+    #deleteConfirmModal .modal-footer {
+        border-top: 1px solid var(--line);
+        padding: 16px 22px;
+    }
+
+    #deleteConfirmModal .btn-cancel {
+        background: #fff;
+        border: 1px solid var(--line);
+        color: var(--text-dark);
+        font-weight: 600;
+        font-size: .85rem;
+        padding: 8px 18px;
+        border-radius: 7px;
+    }
+
+        #deleteConfirmModal .btn-cancel:hover {
+            background: #f7f8fa;
+        }
+
+    #deleteConfirmModal .btn-confirm-delete {
+        background: #c0392b;
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        font-size: .85rem;
+        padding: 8px 18px;
+        border-radius: 7px;
+    }
+
+        #deleteConfirmModal .btn-confirm-delete:hover {
+            background: #a5311f;
+        }
+</style>
+
+<div class="page-header">
+    <div>
+        <p class="page-header-eyebrow">Raporlar</p>
+        <h1 class="page-header-title">@ViewBag.TaskTitle Raporları</h1>
+    </div>
+</div>
+
+<div class="table-wrap">
+    <div class="table-toolbar">
+        <a asp-action="CreateReport" asp-controller="AppTask" asp-route-taskId="@ViewBag.TaskId" asp-area="Member" class="btn-add">Yeni Rapor Yaz</a>
+    </div>
+    <table class="table table-sm mb-0">
+        <thead>
+            <tr>
+                <th scope="col">Başlık</th>
+                <th scope="col">Açıklama</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Count > 0)
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Definition</td>
+                        <td>@item.Detail</td>
+                        <td>
+                            <a asp-action="UpdateReport" asp-controller="AppTask" asp-area="Member" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Düzenle</a>
+                            <a asp-action="DeleteReport" asp-controller="AppTask" asp-area="Member" asp-route-id="@item.Id" asp-route-taskId="@ViewBag.TaskId"
+                               class="btn btn-sm btn-danger js-delete-trigger"
+                               data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">Sil</a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3" class="empty-state">Herhangi bir rapor bulunamadı.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Silme onay modalı -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-icon">!</div>
+                    <h5 class="modal-title">Raporu silmek istediğinize emin misiniz?</h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body">
+                Bu işlem geri alınamaz. Rapor kalıcı olarak silinecektir.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" data-bs-dismiss="modal">Vazgeç</button>
+                <a href="#" id="confirmDeleteLink" class="btn-confirm-delete">Evet, Sil</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('deleteConfirmModal').addEventListener('show.bs.modal', function (event) {
+        var trigger = event.relatedTarget;
+        var deleteUrl = trigger.getAttribute('href');
+        document.getElementById('confirmDeleteLink').setAttribute('href', deleteUrl);
+    });
+</script>
