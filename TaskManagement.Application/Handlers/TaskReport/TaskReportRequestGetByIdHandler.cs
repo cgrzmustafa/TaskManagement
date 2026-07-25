@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using TaskManagement.Application.Dtos;
-using TaskManagement.Application.Extensions;
 using TaskManagement.Application.Interfaces;
 using TaskManagement.Application.Requests;
 

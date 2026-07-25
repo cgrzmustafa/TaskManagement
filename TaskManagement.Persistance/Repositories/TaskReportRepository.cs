@@ -31,10 +31,10 @@ namespace TaskManagement.Persistance.Repositories
         {
             if (asNoTracking)
             {
-                return await this.context.TaskReports.Include(x=> x.AppTask).AsNoTracking
+                return await this.context.TaskReports.Include(x => x.AppTask).AsNoTracking
                     ().Where(filter).ToListAsync();
             }
-            return await this.context.TaskReports.Include(x=> x.AppTask).Where(filter).ToListAsync();
+            return await this.context.TaskReports.Include(x => x.AppTask).Where(filter).ToListAsync();
         }
 
         public async Task<TaskReport?> GetByFilter(Expression<Func<TaskReport, bool>> filter, bool asNoTracking = true)

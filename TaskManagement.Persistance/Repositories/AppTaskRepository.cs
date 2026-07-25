@@ -47,7 +47,7 @@ namespace TaskManagement.Persistance.Repositories
 
 
 
-            var list = await query.Where(x=>x.AppUserId == userId).Include(x => x.AppUser).Include(x => x.Priority).AsNoTracking().ToPagedAsync(activePage, pageSize);
+            var list = await query.Where(x => x.AppUserId == userId).Include(x => x.AppUser).Include(x => x.Priority).AsNoTracking().ToPagedAsync(activePage, pageSize);
             return list;
         }
 

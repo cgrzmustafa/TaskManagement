@@ -1,14 +1,8 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TaskManagement.Application.Dtos;
 using TaskManagement.Application.Extensions;
 using TaskManagement.Application.Interfaces;
 using TaskManagement.Application.Requests;
-using TaskManagement.Application.Validators.Priority;
 using TaskManagement.Application.Validators.TaskReport;
 
 namespace TaskManagement.Application.Handlers.TaskReport

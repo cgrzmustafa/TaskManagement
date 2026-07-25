@@ -1,9 +1,4 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TaskManagement.Application.Dtos;
 using TaskManagement.Application.Interfaces;
 using TaskManagement.Application.Requests;
@@ -21,7 +16,7 @@ namespace TaskManagement.Application.Handlers.AppTask
 
         public async Task<PagedResult<AppTaskListDto>> Handle(AppTaskListByUserIdRequest request, CancellationToken cancellationToken)
         {
-            var list = await this.repository.GetAllByUserIdAsync(activePage: request.ActivePage, s: request.S, userId : request.UserId ,pageSize: 7);
+            var list = await this.repository.GetAllByUserIdAsync(activePage: request.ActivePage, s: request.S, userId: request.UserId, pageSize: 7);
 
             var result = new List<AppTaskListDto>();
             foreach (var appTask in list.Data)
