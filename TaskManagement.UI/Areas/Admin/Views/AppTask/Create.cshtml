@@ -4,7 +4,6 @@
     ViewBag.Title = "İş Emri Ekleme Ekranı";
 }
 
-<!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
 <style>
@@ -132,7 +131,6 @@
         font-weight: 500;
     }
 
-    /* Harita CSS Stilleri */
     #map {
         height: 280px;
         width: 100%;
@@ -141,6 +139,47 @@
         margin-top: 8px;
         z-index: 1;
     }
+
+    .btn-ai {
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        color: #334155;
+        font-weight: 600;
+        font-size: .80rem;
+        padding: 8px 16px;
+        border-radius: 7px;
+        cursor: pointer;
+        transition: all .2s ease;
+        margin-top: 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .btn-ai:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+        }
+
+    #ai-message {
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-top: 8px;
+        display: block;
+    }
+
+    .ai-success {
+        color: #059669;
+    }
+    /* Yeşil Bilgi */
+    .ai-error {
+        color: #dc2626;
+    }
+    /* Kırmızı Hata */
+    .ai-loading {
+        color: #0284c7;
+    }
+    /* Mavi Yükleniyor */
 </style>
 
 <div class="page-header">
@@ -160,19 +199,22 @@
 
         <div class="mb-3">
             <label class="form-label">Açıklama: </label>
-            <textarea asp-for="Description" class="form-control"></textarea>
+            <textarea asp-for="Description" id="Description" class="form-control"></textarea>
+
+            <button type="button" class="btn-ai" id="btn-analyze">
+                Öncelik Analizi Yap
+            </button>
+            <span id="ai-message"></span>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Öncelik: </label>
-            <select class="form-control" asp-for="PriorityId" asp-items="@ViewBag.Priorities"></select>
+            <select class="form-control" asp-for="PriorityId" id="PriorityId" asp-items="@ViewBag.Priorities"></select>
         </div>
 
-        <!-- Harita Alanı -->
         <div class="mb-3">
             <label class="form-label">Konum Seçiniz (Haritaya Tıklayın): </label>
             <div id="map"></div>
-            <!-- Backend'e gidecek olan gizli veriler -->
             <input type="hidden" asp-for="Latitude" id="Latitude" />
             <input type="hidden" asp-for="Longitude" id="Longitude" />
         </div>
@@ -209,6 +251,57 @@
             } else {
                 currentMarker = L.marker(e.latlng).addTo(map);
             }
+        });
+
+        document.getElementById('btn-analyze').addEventListener('click', function () {
+            var descBox = document.getElementById('Description');
+            var msgBox = document.getElementById('ai-message');
+            var descText = descBox.value;
+
+            if (!descText || descText.trim() === '') {
+                msgBox.className = 'ai-error';
+                msgBox.innerText = 'Lütfen analiz yapabilmem için önce bir açıklama yazın.';
+                return;
+            }
+
+            msgBox.className = 'ai-loading';
+            msgBox.innerText = 'Metin analiz ediliyor...';
+
+            fetch('/Admin/AppTask/PredictPriority', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(descText) 
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    msgBox.className = 'ai-success';
+                    msgBox.innerText = data.message;
+
+                    var prioritySelect = document.getElementById('PriorityId');
+                    prioritySelect.value = data.priorityId;
+
+                    prioritySelect.style.transition = 'all 0.3s ease';
+                    prioritySelect.style.borderColor = '#059669';
+                    prioritySelect.style.boxShadow = '0 0 0 3px rgba(5, 150, 105, 0.2)';
+
+                    setTimeout(() => {
+                        prioritySelect.style.borderColor = 'var(--line)';
+                        prioritySelect.style.boxShadow = 'none';
+                    }, 1500);
+
+                } else {
+                    msgBox.className = 'ai-error';
+                    msgBox.innerText = data.message;
+                }
+            })
+            .catch(err => {
+                msgBox.className = 'ai-error';
+                msgBox.innerText = 'Sunucuya bağlanırken bir hata oluştu.';
+                console.error(err);
+            });
         });
     });
 </script>

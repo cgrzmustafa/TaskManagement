@@ -114,5 +114,36 @@ namespace TaskManagement.UI.Controllers.Admin
             }
             return View(request);
         }
+
+        [HttpPost]
+        public IActionResult PredictPriority([FromBody] string description)
+        {
+            if (string.IsNullOrWhiteSpace(description))
+            {
+                return Json(new { success = false, message = "Lütfen önce açıklama giriniz." });
+            }
+
+            string text = description.ToLower();
+
+            int predictedPriorityId = 4;
+            string aiMessage = "Metin analiz edildi. Standart bir işlem algılandı, öncelik 'Normal' atandı.";
+
+            string[] cokAcilKeywords = { "tehlike", "çökme", "kaza", "yangın", "kriz", "patlama", "yaralı" };
+
+            string[] acilKeywords = { "acil", "hemen", "patlak", "arıza", "sızıntı", "kopuk" };
+
+            if (cokAcilKeywords.Any(keyword => text.Contains(keyword)))
+            {
+                predictedPriorityId = 1; 
+                aiMessage = "Kritik tehlike kelimeleri algılandı. Öncelik 'Çok Acil' olarak belirlendi.";
+            }
+            else if (acilKeywords.Any(keyword => text.Contains(keyword)))
+            {
+                predictedPriorityId = 2; 
+                aiMessage = "Aciliyet bildiren kelimeler algılandı. Öncelik 'Acil' olarak belirlendi.";
+            }
+
+            return Json(new { success = true, priorityId = predictedPriorityId, message = aiMessage });
+        }
     }
 }
