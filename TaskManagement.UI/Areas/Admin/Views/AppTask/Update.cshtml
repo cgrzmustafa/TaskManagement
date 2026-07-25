@@ -4,6 +4,8 @@
     ViewBag.Title = "İş Emri Detay Ekranı";
 }
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
 <style>
     .page-header {
         display: flex;
@@ -128,6 +130,16 @@
         color: #c0392b;
         font-weight: 500;
     }
+
+    /* Harita CSS Stilleri */
+    #map {
+        height: 280px;
+        width: 100%;
+        border-radius: 7px;
+        border: 1px solid var(--line);
+        margin-top: 8px;
+        z-index: 1;
+    }
 </style>
 
 <div class="page-header">
@@ -146,22 +158,28 @@
 
         <div class="mb-3">
             <label class="form-label">Açıklama: </label>
-            <textarea asp-for="Description" class="form-control"> 
-
-            </textarea>
+            <textarea asp-for="Description" class="form-control"></textarea>
         </div>
 
         <div class="mb-3">
             <label>Öncelik: </label>
-            <select class="form-control" asp-for="PriorityId" asp-items="@ViewBag.Priorities">
-            </select>
+            <select class="form-control" asp-for="PriorityId" asp-items="@ViewBag.Priorities"></select>
         </div>
 
         <div class="mb-3">
             <label>Personel: </label>
-            <select class="form-control" asp-for="AppUserId" asp-items="@ViewBag.Members">
-            </select>
+            <select class="form-control" asp-for="AppUserId" asp-items="@ViewBag.Members"></select>
         </div>
+
+        <!-- Harita Alanı -->
+        <div class="mb-3">
+            <label class="form-label">Konum Seçiniz (Konumu değiştirmek için haritaya tıklayın): </label>
+            <div id="map"></div>
+            <!-- Backend'e gidecek olan gizli veriler -->
+            <input type="hidden" asp-for="Latitude" id="Latitude" />
+            <input type="hidden" asp-for="Longitude" id="Longitude" />
+        </div>
+
         <div class="form-actions">
             <button type="submit" class="btn-save">Kaydet</button>
             <a asp-action="List" asp-controller="AppTask" asp-area="Admin" class="btn-cancel-link">Vazgeç</a>
@@ -174,3 +192,41 @@
 <div class="mt-5">
     @await Component.InvokeAsync("TaskReports", new { @appTaskId = Model.Id })
 </div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var modelLat = '@Html.Raw(Model.Latitude != null ? Model.Latitude.Replace(",", ".") : "")';
+        var modelLng = '@Html.Raw(Model.Longitude != null ? Model.Longitude.Replace(",", ".") : "")';
+
+        var centerLat = modelLat ? parseFloat(modelLat) : 41.0082;
+        var centerLng = modelLng ? parseFloat(modelLng) : 28.9784;
+
+        var map = L.map('map').setView([centerLat, centerLng], modelLat ? 15 : 10);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        var currentMarker = null;
+
+        if (modelLat && modelLng) {
+            currentMarker = L.marker([centerLat, centerLng]).addTo(map);
+        }
+
+        map.on('click', function (e) {
+            var lat = e.latlng.lat;
+            var lng = e.latlng.lng;
+
+            document.getElementById('Latitude').value = lat.toString().replace('.', ',');
+            document.getElementById('Longitude').value = lng.toString().replace('.', ',');
+
+            if (currentMarker) {
+                currentMarker.setLatLng(e.latlng);
+            } else {
+                currentMarker = L.marker(e.latlng).addTo(map);
+            }
+        });
+    });
+</script>

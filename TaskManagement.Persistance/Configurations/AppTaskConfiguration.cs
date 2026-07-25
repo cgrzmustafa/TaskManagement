@@ -16,8 +16,10 @@ namespace TaskManagement.Persistance.Configurations
             builder.Property(x => x.Title).IsRequired(true);
             builder.Property(x => x.Title).HasMaxLength(250);
 
-            builder.HasMany(x => x.TaskReports).WithOne(x => x.AppTask).HasForeignKey(x => x.AppTaskId);
+            builder.Property(x => x.Latitude).HasMaxLength(50).IsRequired(false);
+            builder.Property(x => x.Longitude).HasMaxLength(50).IsRequired(false);
 
+            builder.HasMany(x => x.TaskReports).WithOne(x => x.AppTask).HasForeignKey(x => x.AppTaskId);
         }
     }
 }

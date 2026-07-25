@@ -59,20 +59,21 @@ namespace TaskManagement.Application.Handlers.AppTask
                     }
 
                     updated.AppUserId = request.AppUserId;
-
-
                 }
 
                 updated.Title = request.Title;
                 updated.Description = request.Description;
                 updated.PriorityId = request.PriorityId;
 
+                updated.Latitude = request.Latitude;
+                updated.Longitude = request.Longitude;
+
                 var rows = await this.repository.SaveChangesAsync();
 
                 if (rows > 0)
                     return new Result<AppTaskDto>(new AppTaskDto(priorityDtoList, memberDtoList), true, null, null);
 
-                return new Result<AppTaskDto>(new AppTaskDto(priorityDtoList, memberDtoList), false, "bir hata oluştu", null);
+                return new Result<AppTaskDto>(new AppTaskDto(priorityDtoList, memberDtoList), false, "bir hata oluştu veya hiçbir değişiklik yapılmadı", null);
             }
             else
             {

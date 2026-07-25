@@ -11,6 +11,7 @@ namespace TaskManagement.Application.Requests
         }
         public string? S { get; set; }
     }
+
     public record AppTaskListByUserIdRequest : PagedRequest, IRequest<PagedResult<AppTaskListDto>>
     {
         public AppTaskListByUserIdRequest(int activePage, string s, int userId) : base(activePage)
@@ -21,11 +22,14 @@ namespace TaskManagement.Application.Requests
         public string? S { get; set; }
         public int UserId { get; set; }
     }
+
     public record AppTaskGetByIdRequest(int Id) : IRequest<Result<AppTaskListDto>>;
-    public record AppTaskCreateRequest(string? Title, string? Description, int PriorityId) : IRequest<Result<AppTaskDto>>;
+
+    public record AppTaskCreateRequest(string? Title, string? Description, int PriorityId, string? Latitude, string? Longitude) : IRequest<Result<AppTaskDto>>;
+
     public record AppTaskDeleteRequest(int Id) : IRequest<Result<NoData>>;
-    public record AppTaskUpdateRequest(int Id, string? Title, string? Description, int PriorityId, int? AppUserId) : IRequest<Result<AppTaskDto>>;
+
+    public record AppTaskUpdateRequest(int Id, string? Title, string? Description, int PriorityId, int? AppUserId, string? Latitude, string? Longitude) : IRequest<Result<AppTaskDto>>;
+
     public record AppTaskCompleteRequest(int Id) : IRequest<Result<NoData>>;
-
-
 }

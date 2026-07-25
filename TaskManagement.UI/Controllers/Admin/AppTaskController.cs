@@ -60,12 +60,14 @@ namespace TaskManagement.UI.Controllers.Admin
             }
             return View(request);
         }
+
         public async Task<IActionResult> Delete(int id)
         {
             ViewBag.Active = "AppTask";
             var result = await this.mediator.Send(new AppTaskDeleteRequest(id));
             return RedirectToAction("List");
         }
+
         public async Task<IActionResult> Update(int id)
         {
             var updated = await this.mediator.Send(new AppTaskGetByIdRequest(id));
@@ -82,7 +84,7 @@ namespace TaskManagement.UI.Controllers.Admin
             }
 
             ViewBag.Members = members;
-            return View(new AppTaskUpdateRequest(updated.Data.Id, updated.Data.Title, updated.Data.Description, updated.Data.PriorityId, updated.Data.AppUserId));
+            return View(new AppTaskUpdateRequest(updated.Data.Id, updated.Data.Title, updated.Data.Description, updated.Data.PriorityId, updated.Data.AppUserId, updated.Data.Latitude, updated.Data.Longitude));
         }
 
         [HttpPost]

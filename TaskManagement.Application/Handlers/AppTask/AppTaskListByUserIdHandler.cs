@@ -21,7 +21,7 @@ namespace TaskManagement.Application.Handlers.AppTask
             var result = new List<AppTaskListDto>();
             foreach (var appTask in list.Data)
             {
-                var dto = new AppTaskListDto(appTask.Id, appTask.Title, appTask.Description, appTask?.Priority?.Definiton, appTask?.State ?? false, appTask.AppUserId, appTask.AppUserId.HasValue ? appTask.AppUser?.Name + " " + appTask.AppUser?.Surname : null, appTask.PriorityId);
+                var dto = new AppTaskListDto(appTask.Id, appTask.Title, appTask.Description, appTask?.Priority?.Definiton, appTask?.State ?? false, appTask.AppUserId, appTask.AppUserId.HasValue ? appTask.AppUser?.Name + " " + appTask.AppUser?.Surname : null, appTask.PriorityId, appTask.Latitude, appTask.Longitude);
                 result.Add(dto);
             }
             return new PagedResult<AppTaskListDto>(result, request.ActivePage, list.PageSize, list.TotalPages);

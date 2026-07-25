@@ -34,13 +34,26 @@ namespace TaskManagement.Application.Extensions
                 Description = request.Description,
                 Title = request.Title,
                 PriorityId = request.PriorityId,
-                State = false
+                State = false,
+                Latitude = request.Latitude,   
+                Longitude = request.Longitude  
             };
         }
 
         public static AppTaskListDto ToMap(this AppTask appTask)
         {
-            return new AppTaskListDto(appTask.Id, appTask.Title, appTask.Description, appTask?.Priority?.Definiton, appTask.State, appTask.AppUserId, appTask.AppUserId.HasValue ? appTask.AppUser?.Name + " " + appTask.AppUser?.Surname : null, appTask.PriorityId);
+            return new AppTaskListDto(
+                appTask.Id,
+                appTask.Title,
+                appTask.Description,
+                appTask?.Priority?.Definiton,
+                appTask.State,
+                appTask.AppUserId,
+                appTask.AppUserId.HasValue ? appTask.AppUser?.Name + " " + appTask.AppUser?.Surname : null,
+                appTask.PriorityId,
+                appTask.Latitude,   
+                appTask.Longitude   
+            );
         }
 
         public static List<MemberListDto> ToMap(this List<AppUser> users)
@@ -52,6 +65,5 @@ namespace TaskManagement.Application.Extensions
         {
             return list.Select(x => new TaskReportListDto(x.Id, x.Definition, x.Detail, x.AppTaskId, x.AppTask.Title)).ToList();
         }
-
     }
 }

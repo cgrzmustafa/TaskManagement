@@ -4,6 +4,9 @@
     ViewBag.Title = "İş Emri Ekleme Ekranı";
 }
 
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
 <style>
     .page-header {
         display: flex;
@@ -128,6 +131,16 @@
         color: #c0392b;
         font-weight: 500;
     }
+
+    /* Harita CSS Stilleri */
+    #map {
+        height: 280px;
+        width: 100%;
+        border-radius: 7px;
+        border: 1px solid var(--line);
+        margin-top: 8px;
+        z-index: 1;
+    }
 </style>
 
 <div class="page-header">
@@ -147,22 +160,55 @@
 
         <div class="mb-3">
             <label class="form-label">Açıklama: </label>
-            <textarea asp-for="Description" class="form-control"> 
-
-            </textarea>
+            <textarea asp-for="Description" class="form-control"></textarea>
         </div>
 
         <div class="mb-3">
-            <label>Öncelik: </label>
-            <select class="form-control" asp-for="PriorityId" asp-items="@ViewBag.Priorities">
-
-            </select>
+            <label class="form-label">Öncelik: </label>
+            <select class="form-control" asp-for="PriorityId" asp-items="@ViewBag.Priorities"></select>
         </div>
+
+        <!-- Harita Alanı -->
+        <div class="mb-3">
+            <label class="form-label">Konum Seçiniz (Haritaya Tıklayın): </label>
+            <div id="map"></div>
+            <!-- Backend'e gidecek olan gizli veriler -->
+            <input type="hidden" asp-for="Latitude" id="Latitude" />
+            <input type="hidden" asp-for="Longitude" id="Longitude" />
+        </div>
+
         <div class="form-actions">
             <button type="submit" class="btn-save">Kaydet</button>
             <a asp-action="List" asp-controller="AppTask" asp-area="Admin" class="btn-cancel-link">Vazgeç</a>
         </div>
-        <div asp-validation-summary="All">
-        </div>
+        <div asp-validation-summary="All"></div>
     </form>
 </div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var map = L.map('map').setView([41.0082, 28.9784], 10);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        var currentMarker = null;
+
+        map.on('click', function (e) {
+            var lat = e.latlng.lat;
+            var lng = e.latlng.lng;
+
+            document.getElementById('Latitude').value = lat.toString().replace('.', ',');
+            document.getElementById('Longitude').value = lng.toString().replace('.', ',');
+
+            if (currentMarker) {
+                currentMarker.setLatLng(e.latlng);
+            } else {
+                currentMarker = L.marker(e.latlng).addTo(map);
+            }
+        });
+    });
+</script>
