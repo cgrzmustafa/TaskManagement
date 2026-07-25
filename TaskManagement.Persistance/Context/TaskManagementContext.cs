@@ -18,6 +18,8 @@ namespace TaskManagement.Persistance.Context
         public DbSet<Priority> Priorities { get; set; }
         public DbSet<TaskReport> TaskReports { get; set; }
 
+        public DbSet<AuditLog> AuditLogs { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new AppRoleConfiguration());

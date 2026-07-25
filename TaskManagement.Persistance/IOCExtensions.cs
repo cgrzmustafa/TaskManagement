@@ -21,6 +21,7 @@ namespace TaskManagement.Persistance
             services.AddScoped<IAppTaskRepository, AppTaskRepository>();
             services.AddScoped<ITaskReportRepository, TaskReportRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
+            services.AddScoped<IAuditLogRepository, AuditLogRepository>();
         }
     }
 }
