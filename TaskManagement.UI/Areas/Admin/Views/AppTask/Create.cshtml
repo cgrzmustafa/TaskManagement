@@ -140,10 +140,7 @@
         z-index: 1;
     }
 
-    .btn-ai {
-        background: #f8fafc;
-        border: 1px solid #cbd5e1;
-        color: #334155;
+    .btn-ai, .btn-optimize {
         font-weight: 600;
         font-size: .80rem;
         padding: 8px 16px;
@@ -156,37 +153,53 @@
         gap: 6px;
     }
 
+    .btn-ai {
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        color: #334155;
+    }
+
         .btn-ai:hover {
             background: #f1f5f9;
             border-color: #94a3b8;
         }
 
-    #ai-message {
+    .btn-optimize {
+        background: #fdf4ff;
+        border: 1px solid #f0abfc;
+        color: #86198f;
+    }
+
+        .btn-optimize:hover {
+            background: #fae8ff;
+            border-color: #e879f9;
+        }
+
+    .status-msg {
         font-size: 0.8rem;
         font-weight: 600;
         margin-top: 8px;
         display: block;
     }
 
-    .ai-success {
+    .msg-success {
         color: #059669;
     }
-    /* Yeşil Bilgi */
-    .ai-error {
+
+    .msg-error {
         color: #dc2626;
     }
-    /* Kırmızı Hata */
-    .ai-loading {
+
+    .msg-loading {
         color: #0284c7;
     }
-    /* Mavi Yükleniyor */
 </style>
 
 <div class="page-header">
     <div>
         <p class="page-header-eyebrow">Tanımlamalar</p>
         <h1 class="page-header-title">İş Emri Ekleme Ekranı</h1>
-        <p class="page-header-sub">Yeni bir iş emri oluşturun.</p>
+        <p class="page-header-sub">Yeni bir iş emri oluşturun ve personeli atayın.</p>
     </div>
 </div>
 
@@ -201,15 +214,28 @@
             <label class="form-label">Açıklama: </label>
             <textarea asp-for="Description" id="Description" class="form-control"></textarea>
 
+            
             <button type="button" class="btn-ai" id="btn-analyze">
                 Öncelik Analizi Yap
             </button>
-            <span id="ai-message"></span>
+            <span id="ai-message" class="status-msg"></span>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Öncelik: </label>
             <select class="form-control" asp-for="PriorityId" id="PriorityId" asp-items="@ViewBag.Priorities"></select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Personel: </label>
+            <select class="form-control" asp-for="AppUserId" id="AppUserId" asp-items="@ViewBag.Members">
+                <option value="">-- Personel Seçiniz --</option>
+            </select>
+
+            <button type="button" class="btn-optimize" id="btn-auto-assign">
+                En Uygun Personeli Ata
+            </button>
+            <span id="assign-message" class="status-msg"></span>
         </div>
 
         <div class="mb-3">
@@ -231,26 +257,17 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         var map = L.map('map').setView([41.0082, 28.9784], 10);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
-
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
         var currentMarker = null;
 
         map.on('click', function (e) {
             var lat = e.latlng.lat;
             var lng = e.latlng.lng;
-
             document.getElementById('Latitude').value = lat.toString().replace('.', ',');
             document.getElementById('Longitude').value = lng.toString().replace('.', ',');
 
-            if (currentMarker) {
-                currentMarker.setLatLng(e.latlng);
-            } else {
-                currentMarker = L.marker(e.latlng).addTo(map);
-            }
+            if (currentMarker) { currentMarker.setLatLng(e.latlng); }
+            else { currentMarker = L.marker(e.latlng).addTo(map); }
         });
 
         document.getElementById('btn-analyze').addEventListener('click', function () {
@@ -259,46 +276,71 @@
             var descText = descBox.value;
 
             if (!descText || descText.trim() === '') {
-                msgBox.className = 'ai-error';
+                msgBox.className = 'status-msg msg-error';
                 msgBox.innerText = 'Lütfen analiz yapabilmem için önce bir açıklama yazın.';
                 return;
             }
 
-            msgBox.className = 'ai-loading';
-            msgBox.innerText = 'Metin analiz ediliyor...';
+            msgBox.className = 'status-msg msg-loading';
+            msgBox.innerText = '🤖 Metin analiz ediliyor...';
 
             fetch('/Admin/AppTask/PredictPriority', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(descText) 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(descText)
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    msgBox.className = 'ai-success';
+                    msgBox.className = 'status-msg msg-success';
                     msgBox.innerText = data.message;
-
                     var prioritySelect = document.getElementById('PriorityId');
                     prioritySelect.value = data.priorityId;
-
                     prioritySelect.style.transition = 'all 0.3s ease';
                     prioritySelect.style.borderColor = '#059669';
                     prioritySelect.style.boxShadow = '0 0 0 3px rgba(5, 150, 105, 0.2)';
+                    setTimeout(() => { prioritySelect.style.borderColor = 'var(--line)'; prioritySelect.style.boxShadow = 'none'; }, 1500);
+                } else {
+                    msgBox.className = 'status-msg msg-error';
+                    msgBox.innerText = data.message;
+                }
+            })
+            .catch(err => console.error(err));
+        });
+
+        document.getElementById('btn-auto-assign').addEventListener('click', function () {
+            var msgBox = document.getElementById('assign-message');
+            msgBox.className = 'status-msg msg-loading';
+            msgBox.innerText = 'Saha personeli iş yükleri analiz ediliyor...';
+
+            fetch('/Admin/AppTask/AutoAssignPersonnel', {
+                method: 'GET'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    msgBox.className = 'status-msg msg-success';
+                    msgBox.innerText = data.message;
+
+                    var userSelect = document.getElementById('AppUserId');
+                    userSelect.value = data.userId;
+
+                    userSelect.style.transition = 'all 0.3s ease';
+                    userSelect.style.borderColor = '#86198f'; 
+                    userSelect.style.boxShadow = '0 0 0 3px rgba(134, 25, 143, 0.2)';
 
                     setTimeout(() => {
-                        prioritySelect.style.borderColor = 'var(--line)';
-                        prioritySelect.style.boxShadow = 'none';
+                        userSelect.style.borderColor = 'var(--line)';
+                        userSelect.style.boxShadow = 'none';
                     }, 1500);
 
                 } else {
-                    msgBox.className = 'ai-error';
+                    msgBox.className = 'status-msg msg-error';
                     msgBox.innerText = data.message;
                 }
             })
             .catch(err => {
-                msgBox.className = 'ai-error';
+                msgBox.className = 'status-msg msg-error';
                 msgBox.innerText = 'Sunucuya bağlanırken bir hata oluştu.';
                 console.error(err);
             });

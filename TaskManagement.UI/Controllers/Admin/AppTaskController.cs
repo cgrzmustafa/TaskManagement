@@ -29,7 +29,12 @@ namespace TaskManagement.UI.Controllers.Admin
         {
             var result = await this.mediator.Send(new PriorityListRequest());
 
+            var membersResult = await this.mediator.Send(new MemberListRequest());
+
             ViewBag.Priorities = new List<SelectListItem>(result.Data.Select(x => new SelectListItem(x.Definition, x.Id.ToString())));
+
+            ViewBag.Members = new List<SelectListItem>(membersResult.Data.Select(x => new SelectListItem(x.Name + " " + x.Surname, x.Id.ToString())));
+
             return View();
         }
 
@@ -38,8 +43,11 @@ namespace TaskManagement.UI.Controllers.Admin
         {
             var result = await this.mediator.Send(request);
 
-
             ViewBag.Priorities = new List<SelectListItem>(result.Data.Priorities.Select(x => new SelectListItem(x.Definition, x.Id.ToString())));
+
+            var membersResult = await this.mediator.Send(new MemberListRequest());
+            ViewBag.Members = new List<SelectListItem>(membersResult.Data.Select(x => new SelectListItem(x.Name + " " + x.Surname, x.Id.ToString(), x.Id == request.AppUserId)));
+
             if (result.IsSuccess)
             {
                 return RedirectToAction("List");
@@ -134,16 +142,36 @@ namespace TaskManagement.UI.Controllers.Admin
 
             if (cokAcilKeywords.Any(keyword => text.Contains(keyword)))
             {
-                predictedPriorityId = 1; 
+                predictedPriorityId = 1;
                 aiMessage = "Kritik tehlike kelimeleri algılandı. Öncelik 'Çok Acil' olarak belirlendi.";
             }
             else if (acilKeywords.Any(keyword => text.Contains(keyword)))
             {
-                predictedPriorityId = 2; 
+                predictedPriorityId = 2;
                 aiMessage = "Aciliyet bildiren kelimeler algılandı. Öncelik 'Acil' olarak belirlendi.";
             }
 
             return Json(new { success = true, priorityId = predictedPriorityId, message = aiMessage });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AutoAssignPersonnel()
+        {
+            var result = await this.mediator.Send(new AutoAssignPersonnelRequest());
+
+            if (!result.IsSuccess || result.Data == null)
+            {
+                return Json(new { success = false, message = result.ErrorMessage ?? "Sistemde atanabilecek personel bulunamadı." });
+            }
+
+            var optimizedUser = result.Data;
+
+            return Json(new
+            {
+                success = true,
+                userId = optimizedUser.Id,
+                message = $"Optimizasyon: İş yükleri analiz edildi. En müsait personel '{optimizedUser.Name} {optimizedUser.Surname}' olarak atandı."
+            });
         }
     }
 }

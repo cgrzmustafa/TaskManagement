@@ -25,11 +25,12 @@ namespace TaskManagement.Application.Requests
 
     public record AppTaskGetByIdRequest(int Id) : IRequest<Result<AppTaskListDto>>;
 
-    public record AppTaskCreateRequest(string? Title, string? Description, int PriorityId, string? Latitude, string? Longitude) : IRequest<Result<AppTaskDto>>;
+    public record AppTaskCreateRequest(string? Title, string? Description, int PriorityId, int? AppUserId, string? Latitude, string? Longitude) : IRequest<Result<AppTaskDto>>;
 
     public record AppTaskDeleteRequest(int Id) : IRequest<Result<NoData>>;
 
     public record AppTaskUpdateRequest(int Id, string? Title, string? Description, int PriorityId, int? AppUserId, string? Latitude, string? Longitude) : IRequest<Result<AppTaskDto>>;
 
     public record AppTaskCompleteRequest(int Id) : IRequest<Result<NoData>>;
+    public record AutoAssignPersonnelRequest() : IRequest<Result<MemberListDto>>;
 }

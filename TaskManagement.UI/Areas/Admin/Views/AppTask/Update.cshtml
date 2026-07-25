@@ -1,9 +1,10 @@
-﻿@model AppTaskUpdateRequest
+﻿@model TaskManagement.Application.Requests.AppTaskUpdateRequest
 @{
     Layout = "_AdminLayout";
-    ViewBag.Title = "İş Emri Detay Ekranı";
+    ViewBag.Title = "İş Emri Güncelleme Ekranı";
 }
 
+<!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
 <style>
@@ -67,10 +68,6 @@
                 box-shadow: 0 0 0 3px var(--accent-soft);
             }
 
-            .form-card .form-control.input-validation-error {
-                border-color: #c0392b;
-            }
-
     .form-actions {
         display: flex;
         gap: 10px;
@@ -119,19 +116,7 @@
         font-size: .85rem;
     }
 
-        .validation-summary-errors ul li {
-            margin: 0;
-        }
-
-    span.field-validation-error {
-        display: block;
-        margin-top: 6px;
-        font-size: .78rem;
-        color: #c0392b;
-        font-weight: 500;
-    }
-
-    /* Harita CSS Stilleri */
+    /* Harita CSS */
     #map {
         height: 280px;
         width: 100%;
@@ -140,17 +125,75 @@
         margin-top: 8px;
         z-index: 1;
     }
+
+    /* YZ ve Optimizasyon Buton Stilleri */
+    .btn-ai, .btn-optimize {
+        font-weight: 600;
+        font-size: .80rem;
+        padding: 8px 16px;
+        border-radius: 7px;
+        cursor: pointer;
+        transition: all .2s ease;
+        margin-top: 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-ai {
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        color: #334155;
+    }
+
+        .btn-ai:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+        }
+
+    .btn-optimize {
+        background: #fdf4ff;
+        border: 1px solid #f0abfc;
+        color: #86198f;
+    }
+
+        .btn-optimize:hover {
+            background: #fae8ff;
+            border-color: #e879f9;
+        }
+
+    .status-msg {
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-top: 8px;
+        display: block;
+    }
+
+    .msg-success {
+        color: #059669;
+    }
+
+    .msg-error {
+        color: #dc2626;
+    }
+
+    .msg-loading {
+        color: #0284c7;
+    }
 </style>
 
 <div class="page-header">
     <div>
         <p class="page-header-eyebrow">Tanımlamalar</p>
         <h1 class="page-header-title">İş Emri Güncelleme Ekranı</h1>
-        <p class="page-header-sub">İş emirlerini güncelleyin.</p>
+        <p class="page-header-sub">İş emri detaylarını ve atanmış personeli güncelleyin.</p>
     </div>
 </div>
+
 <div class="form-card">
     <form asp-action="Update" asp-controller="AppTask" asp-area="Admin" method="post">
+        <input type="hidden" asp-for="Id" />
+
         <div class="mb-3">
             <label class="form-label">Başlık: </label>
             <input asp-for="Title" class="form-control" />
@@ -158,75 +201,140 @@
 
         <div class="mb-3">
             <label class="form-label">Açıklama: </label>
-            <textarea asp-for="Description" class="form-control"></textarea>
+            <textarea asp-for="Description" id="Description" class="form-control"></textarea>
+
+            <button type="button" class="btn-ai" id="btn-analyze">
+                Öncelik Analizi Yap
+            </button>
+            <span id="ai-message" class="status-msg"></span>
         </div>
 
         <div class="mb-3">
-            <label>Öncelik: </label>
-            <select class="form-control" asp-for="PriorityId" asp-items="@ViewBag.Priorities"></select>
+            <label class="form-label">Öncelik: </label>
+            <select class="form-control" asp-for="PriorityId" id="PriorityId" asp-items="@ViewBag.Priorities"></select>
         </div>
 
         <div class="mb-3">
-            <label>Personel: </label>
-            <select class="form-control" asp-for="AppUserId" asp-items="@ViewBag.Members"></select>
+            <label class="form-label">Personel: </label>
+            <select class="form-control" asp-for="AppUserId" id="AppUserId" asp-items="@ViewBag.Members">
+            </select>
+
+            <button type="button" class="btn-optimize" id="btn-auto-assign">
+               En Uygun Personeli Ata
+            </button>
+            <span id="assign-message" class="status-msg"></span>
         </div>
 
-        <!-- Harita Alanı -->
         <div class="mb-3">
-            <label class="form-label">Konum Seçiniz (Konumu değiştirmek için haritaya tıklayın): </label>
+            <label class="form-label">Konum Seçiniz (Haritaya Tıklayın): </label>
             <div id="map"></div>
-            <!-- Backend'e gidecek olan gizli veriler -->
             <input type="hidden" asp-for="Latitude" id="Latitude" />
             <input type="hidden" asp-for="Longitude" id="Longitude" />
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn-save">Kaydet</button>
+            <button type="submit" class="btn-save">Güncelle</button>
             <a asp-action="List" asp-controller="AppTask" asp-area="Admin" class="btn-cancel-link">Vazgeç</a>
         </div>
-        <div asp-validation-summary="All">
-        </div>
+        <div asp-validation-summary="All"></div>
     </form>
-</div>
-
-<div class="mt-5">
-    @await Component.InvokeAsync("TaskReports", new { @appTaskId = Model.Id })
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        var modelLat = '@Html.Raw(Model.Latitude != null ? Model.Latitude.Replace(",", ".") : "")';
-        var modelLng = '@Html.Raw(Model.Longitude != null ? Model.Longitude.Replace(",", ".") : "")';
+        var latInput = document.getElementById('Latitude').value;
+        var lngInput = document.getElementById('Longitude').value;
 
-        var centerLat = modelLat ? parseFloat(modelLat) : 41.0082;
-        var centerLng = modelLng ? parseFloat(modelLng) : 28.9784;
+        var startLat = latInput ? parseFloat(latInput.replace(',', '.')) : 41.0082;
+        var startLng = lngInput ? parseFloat(lngInput.replace(',', '.')) : 28.9784;
 
-        var map = L.map('map').setView([centerLat, centerLng], modelLat ? 15 : 10);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
+        var map = L.map('map').setView([startLat, startLng], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
         var currentMarker = null;
 
-        if (modelLat && modelLng) {
-            currentMarker = L.marker([centerLat, centerLng]).addTo(map);
+        if(latInput && lngInput) {
+            currentMarker = L.marker([startLat, startLng]).addTo(map);
         }
 
         map.on('click', function (e) {
             var lat = e.latlng.lat;
             var lng = e.latlng.lng;
-
             document.getElementById('Latitude').value = lat.toString().replace('.', ',');
             document.getElementById('Longitude').value = lng.toString().replace('.', ',');
 
-            if (currentMarker) {
-                currentMarker.setLatLng(e.latlng);
-            } else {
-                currentMarker = L.marker(e.latlng).addTo(map);
+            if (currentMarker) { currentMarker.setLatLng(e.latlng); }
+            else { currentMarker = L.marker(e.latlng).addTo(map); }
+        });
+
+        document.getElementById('btn-analyze').addEventListener('click', function () {
+            var descBox = document.getElementById('Description');
+            var msgBox = document.getElementById('ai-message');
+            var descText = descBox.value;
+
+            if (!descText || descText.trim() === '') {
+                msgBox.className = 'status-msg msg-error';
+                msgBox.innerText = 'Lütfen analiz yapabilmem için önce bir açıklama yazın.';
+                return;
             }
+
+            msgBox.className = 'status-msg msg-loading';
+            msgBox.innerText = '🤖 Metin analiz ediliyor...';
+
+            fetch('/Admin/AppTask/PredictPriority', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(descText)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    msgBox.className = 'status-msg msg-success';
+                    msgBox.innerText = data.message;
+                    var prioritySelect = document.getElementById('PriorityId');
+                    prioritySelect.value = data.priorityId;
+                    prioritySelect.style.transition = 'all 0.3s ease';
+                    prioritySelect.style.borderColor = '#059669';
+                    prioritySelect.style.boxShadow = '0 0 0 3px rgba(5, 150, 105, 0.2)';
+                    setTimeout(() => { prioritySelect.style.borderColor = 'var(--line)'; prioritySelect.style.boxShadow = 'none'; }, 1500);
+                }
+            })
+            .catch(err => console.error(err));
+        });
+
+        document.getElementById('btn-auto-assign').addEventListener('click', function () {
+            var msgBox = document.getElementById('assign-message');
+            msgBox.className = 'status-msg msg-loading';
+            msgBox.innerText = '⚡ Saha personeli iş yükleri analiz ediliyor...';
+
+            fetch('/Admin/AppTask/AutoAssignPersonnel', {
+                method: 'GET'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    msgBox.className = 'status-msg msg-success';
+                    msgBox.innerText = data.message;
+
+                    var userSelect = document.getElementById('AppUserId');
+                    userSelect.value = data.userId;
+
+                    userSelect.style.transition = 'all 0.3s ease';
+                    userSelect.style.borderColor = '#86198f'; 
+                    userSelect.style.boxShadow = '0 0 0 3px rgba(134, 25, 143, 0.2)';
+
+                    setTimeout(() => {
+                        userSelect.style.borderColor = 'var(--line)';
+                        userSelect.style.boxShadow = 'none';
+                    }, 1500);
+
+                } else {
+                    msgBox.className = 'status-msg msg-error';
+                    msgBox.innerText = data.message;
+                }
+            })
+            .catch(err => console.error(err));
         });
     });
 </script>

@@ -35,8 +35,9 @@ namespace TaskManagement.Application.Extensions
                 Title = request.Title,
                 PriorityId = request.PriorityId,
                 State = false,
-                Latitude = request.Latitude,   
-                Longitude = request.Longitude  
+                Latitude = request.Latitude,
+                Longitude = request.Longitude,
+                AppUserId = request.AppUserId 
             };
         }
 
@@ -51,8 +52,8 @@ namespace TaskManagement.Application.Extensions
                 appTask.AppUserId,
                 appTask.AppUserId.HasValue ? appTask.AppUser?.Name + " " + appTask.AppUser?.Surname : null,
                 appTask.PriorityId,
-                appTask.Latitude,   
-                appTask.Longitude   
+                appTask.Latitude,
+                appTask.Longitude
             );
         }
 
